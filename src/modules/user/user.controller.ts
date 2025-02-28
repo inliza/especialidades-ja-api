@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from './user.service';
 import { Zone } from '../entities/zone.entity';
 import { Rank } from '../entities/rank.entity';
@@ -9,7 +9,7 @@ import { LoginDto } from '../dtos/login.dto';
 
 @Controller('api/users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   // Endpoints para Zone
   @Get('zones')
@@ -37,20 +37,26 @@ export class UsersController {
     return this.usersService.createUser(createUserDto);
   }
 
+  @Put('update')
+  @UseGuards(AuthGuard('jwt'))
+  async updateUser(@Req() req, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.updateUser(req.user.userId, updateUserDto);
+  }
+
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
     return this.usersService.login(loginDto.email, loginDto.password);
   }
 
-  @Patch(':id')
-  @UseGuards(AuthGuard('jwt')) // Protege la actualización con JWT
-  async updateUser(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.updateUser(+id, updateUserDto);
-  }
+  // @Patch(':id')
+  // @UseGuards(AuthGuard('jwt')) // Protege la actualización con JWT
+  // async updateUser(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
+  //   return this.usersService.updateUser(+id, updateUserDto);
+  // }
 
   @Get('profile')
   @UseGuards(AuthGuard('jwt')) // Ruta protegida
   getProfile(@Req() req) {
-    return req.user; // Retorna los datos del usuario autenticado
+    return this.usersService.getUser(req.user.userId);
   }
 }

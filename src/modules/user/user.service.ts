@@ -43,7 +43,15 @@ export class UsersService {
 
   }
 
-  async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+  async getUser(id: number): Promise<User> {
+    return this.userRepository.findOne({
+      where: { id },
+      select: ['id', 'firstName', 'lastName', 'birthDate', 'church', 'email', 'alias', 'phone', 'zone', 'rank'], // No seleccionamos el campo 'password'
+      relations: ['zone', 'rank'],
+    });
+  }
+
+  async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<any> {
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException('Usuario no encontrado');
@@ -66,7 +74,10 @@ export class UsersService {
     }
 
     Object.assign(user, updateUserDto);
-    return this.userRepository.save(user);
+    await this.userRepository.save(user);
+
+    return { message: `Usuario ${user.email} actualizado con éxito` };
+
   }
 
   async login(email: string, password: string): Promise<{ accessToken: string }> {
@@ -86,6 +97,8 @@ export class UsersService {
     }
     return null;
   }
+
+
 
 
 

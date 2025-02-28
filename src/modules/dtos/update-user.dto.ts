@@ -1,13 +1,52 @@
+import { IsString, IsNotEmpty, IsEmail, IsOptional, IsInt, MinLength, MaxLength, IsDateString, IsNumber } from 'class-validator';
+
 export class UpdateUserDto {
-    firstName?: string;
-    lastName?: string;
-    birthDate?: string;
-    church?: string;
-    email?: string;
-    alias?: string;
-    phone?: string;
-    zoneId?: number;
-    rankId?: number;
+
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(50)
+    firstName: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(50)
+    lastName: string;
+
+    @IsDateString()
+    @IsNotEmpty()
+    birthDate: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(100)
+    church: string;
+
+    @IsEmail()
+    @IsNotEmpty()
+    email: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(30)
+    alias: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @MinLength(10)
+    @MaxLength(15)
+    phone: string;
+
+    @IsInt()
+    @IsNotEmpty()
+    zoneId: number;
+
+    @IsInt()
+    @IsNotEmpty()
+    rankId: number;
+
+    @IsOptional()
+    @IsString()
+    @MinLength(6)
     password?: string;
-  }
-  
+
+}
