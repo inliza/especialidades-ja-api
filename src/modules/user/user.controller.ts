@@ -47,16 +47,15 @@ export class UsersController {
   async login(@Body() loginDto: LoginDto) {
     return this.usersService.login(loginDto.email, loginDto.password);
   }
-
-  // @Patch(':id')
-  // @UseGuards(AuthGuard('jwt')) // Protege la actualización con JWT
-  // async updateUser(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.usersService.updateUser(+id, updateUserDto);
-  // }
-
   @Get('profile')
   @UseGuards(AuthGuard('jwt')) // Ruta protegida
   getProfile(@Req() req) {
     return this.usersService.getUser(req.user.userId);
+  }
+
+  @Get('get-all')
+  @UseGuards(AuthGuard('jwt'))
+  getAll(@Req() req) {
+    return this.usersService.getUsers();
   }
 }

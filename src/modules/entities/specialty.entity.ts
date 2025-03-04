@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, ManyToMany } from 'typeorm';
 import { Category } from './category.entity';
+import { User } from './user.entity';
 
 @Entity('specialties')
 export class Specialty {
@@ -18,4 +19,7 @@ export class Specialty {
 
   @Column({ name: 'id_category', type: 'int' })
   id_category: number;
+
+  @ManyToMany(() => User, (user) => user.specialties)
+  users: User[];
 }
