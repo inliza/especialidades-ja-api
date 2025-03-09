@@ -6,7 +6,7 @@ import { Zone } from '../entities/zone.entity';
 import { Rank } from '../entities/rank.entity';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import * as bcrypt from 'bcrypt';
-import { UpdateUserDto } from '../dtos/update-user.dto';
+import { UpdateUserDto, UpdateUserStatusDto } from '../dtos/update-user.dto';
 import { AuthService } from '../auth/auth.service';
 
 @Injectable()
@@ -46,14 +46,22 @@ export class UsersService {
   async getUser(id: number): Promise<User> {
     return this.userRepository.findOne({
       where: { id },
-      select: ['id', 'firstName', 'lastName', 'birthDate', 'church', 'email', 'alias', 'phone', 'zone', 'rank'], // No seleccionamos el campo 'password'
+      select: ['id', 'firstName', 'lastName', 'birthDate', 'church', 'email', 'alias', 'phone', 'zone', 'rank', 'isAdmin'],
       relations: ['zone', 'rank'],
+    });
+  }
+
+  async getUserWithSpecialties(id: number): Promise<User> {
+    return this.userRepository.findOne({
+      where: { id },
+      select: ['id', 'firstName', 'lastName', 'birthDate', 'church', 'alias', 'phone', 'zone', 'rank'],
+      relations: ['zone', 'rank', 'specialties', 'specialties.category'],
     });
   }
 
   async getUsers(): Promise<User[]> {
     return this.userRepository.find({
-      select: ['id', 'firstName', 'lastName', 'birthDate', 'church', 'email', 'alias', 'phone', 'zone', 'rank'],
+      select: ['id', 'firstName', 'lastName', 'birthDate', 'church', 'email', 'alias', 'phone', 'zone', 'rank', 'isActive'],
       relations: ['zone', 'rank', 'specialties'],
     });
   }
@@ -87,13 +95,29 @@ export class UsersService {
 
   }
 
+  async updateUserStatus(payload: UpdateUserStatusDto): Promise<any> {
+    const user = await this.userRepository.findOne({ where: { id: payload.userId } });
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    user.isActive = payload.active;
+    await this.userRepository.save(user);
+
+    return { message: `Usuario ${user.email} actualizado con éxito status: ${payload.active}` };
+
+  }
+
+
   async login(email: string, password: string): Promise<{ accessToken: string }> {
     const user = await this.validateUser(email, password);
     if (!user) {
       throw new BadRequestException('Credenciales inválidas');
+    }else if(!user.isActive){
+      throw new BadRequestException('Su usuario se encuentra deshabilitado');
     }
 
-    const payload = { email: user.email, sub: user.id };
+    const payload = { email: user.email, sub: user.id, isAdmin: user.isAdmin };
     return { accessToken: await this.authService.generateToken(payload) };
   }
 

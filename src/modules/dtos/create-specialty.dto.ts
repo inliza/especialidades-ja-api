@@ -5,6 +5,11 @@ export class CreateSpecialtyDto {
   @IsNotEmpty()
   name: string;
 
+  @IsString()
+  @IsNotEmpty()
+  url: string;
+
+
   @IsInt()
   @IsNotEmpty()
   id_category: number;

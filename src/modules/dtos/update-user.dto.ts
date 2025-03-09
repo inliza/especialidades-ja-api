@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsEmail, IsOptional, IsInt, MinLength, MaxLength, IsDateString, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsEmail, IsOptional, IsInt, MinLength, MaxLength, IsDateString, IsNumber, IsBoolean } from 'class-validator';
 
 export class UpdateUserDto {
 
@@ -48,5 +48,16 @@ export class UpdateUserDto {
     @IsString()
     @MinLength(6)
     password?: string;
+
+}
+
+export class UpdateUserStatusDto {
+    @IsInt()
+    @IsNotEmpty()
+    userId: number;
+
+    @IsBoolean()
+    @IsNotEmpty()
+    active: boolean;
 
 }

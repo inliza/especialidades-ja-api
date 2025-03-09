@@ -20,6 +20,6 @@ export class AuthService extends PassportStrategy(Strategy) {
     }
 
     async validate(payload: any) {
-        return { userId: payload.sub, email: payload.email }; // Retorna los datos del usuario en el request
+        return { userId: payload.sub, email: payload.email, isAdmin: payload.isAdmin }; // Retorna los datos del usuario en el request
     }
 }

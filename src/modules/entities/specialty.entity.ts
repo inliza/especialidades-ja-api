@@ -10,6 +10,9 @@ export class Specialty {
   @Column({ name: 'name', type: 'varchar' })
   name: string;
 
+  @Column({ name: 'url', type: 'varchar' })
+  url: string;
+
   @Column({ name: 'active', type: 'boolean', default: true })
   active: boolean;
 

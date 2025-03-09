@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Req, ForbiddenException } from '@nestjs/common';
 import { SpecialtyService } from './specialty.service';
 import { CreateCategoryDto, CreateSpecialtyDto } from '../dtos/create-specialty.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -11,13 +11,21 @@ export class SpecialtyController {
     // Crear una nueva especialidad
     @UseGuards(AuthGuard('jwt')) // Ruta protegida
     @Post('create')
-    async create(@Body() specialtyDto: CreateSpecialtyDto) {
+    async create(@Req() req, @Body() specialtyDto: CreateSpecialtyDto) {
+        if (!req.user.isAdmin) {
+            throw new ForbiddenException({ message: 'Usted no tiene permiso para realizar esta accion. Gracias :3' });
+        }
+
         return this.specialtyService.createSpecialty(specialtyDto);
     }
 
     @UseGuards(AuthGuard('jwt')) // Ruta protegida
     @Post('categories/create')
-    async createCategory(@Body() category: CreateCategoryDto) {
+    async createCategory(@Req() req, @Body() category: CreateCategoryDto) {
+        if (!req.user.isAdmin) {
+            throw new ForbiddenException({ message: 'Usted no tiene permiso para realizar esta accion. Gracias :3' });
+        }
+
         return this.specialtyService.createCategory(category);
     }
 

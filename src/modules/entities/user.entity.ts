@@ -55,4 +55,10 @@ export class User {
   })
   specialties: Specialty[];
 
+  @Column({ type: 'boolean', default: false, name: 'isadmin' })
+  isAdmin: boolean;
+
+  @Column({ type: 'boolean', default: true, name: 'isactive' })
+  isActive: boolean;
+
 }
