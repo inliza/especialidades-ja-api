@@ -12,21 +12,23 @@ export class UpdateUserDto {
     @MaxLength(50)
     lastName: string;
 
-    @IsDateString()
-    @IsNotEmpty()
-    birthDate: string;
 
     @IsString()
     @IsNotEmpty()
-    @MaxLength(100)
-    church: string;
+    @MaxLength(50)
+    secondLastName: string;
+
+
+    @IsDateString()
+    @IsNotEmpty()
+    birthDate: string;
 
     @IsEmail()
     @IsNotEmpty()
     email: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     @MaxLength(30)
     alias: string;
 
@@ -43,6 +45,10 @@ export class UpdateUserDto {
     @IsInt()
     @IsNotEmpty()
     rankId: number;
+
+    @IsInt()
+    @IsNotEmpty()
+    churchId: number;
 
     @IsOptional()
     @IsString()

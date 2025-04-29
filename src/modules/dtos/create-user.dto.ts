@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsString, IsEmail, IsNotEmpty, IsDate, IsInt, MinLength, MaxLength, Matches } from 'class-validator';
+import { IsString, IsEmail, IsNotEmpty, IsDate, IsInt, MinLength, MaxLength, Matches, IsOptional } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -12,22 +12,29 @@ export class CreateUserDto {
   @MaxLength(50)
   lastName: string;
 
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(50)
+  secondLastName: string;
+
+
   @IsDate()
   @Type(() => Date)
   @IsNotEmpty()
   birthDate: Date;
 
-  @IsString()
+  @IsInt()
   @IsNotEmpty()
-  @MaxLength(100)
-  church: string;
+  churchId: number;
+
 
   @IsEmail()
   @IsNotEmpty()
   email: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(30)
   alias: string;
 

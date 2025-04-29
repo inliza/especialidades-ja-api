@@ -6,6 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { UpdateUserDto, UpdateUserStatusDto } from '../dtos/update-user.dto';
 import { LoginDto } from '../dtos/login.dto';
+import { Church } from '../entities/church.entity';
 
 @Controller('api/users')
 export class UsersController {
@@ -27,9 +28,25 @@ export class UsersController {
     return this.usersService.getAllRanks();
   }
 
+  @Get('churchs')
+  getAllChurchs(): Promise<Rank[]> {
+    return this.usersService.getAllChurchs();
+  }
+
+
+  @Get('churchs/get-by-zone/:id')
+  getAllChurchsByZone(@Param('id') id: number): Promise<Church[]> {
+    return this.usersService.getAllChurchsByZone(id);
+  }
+
   @Get('ranks/:id')
   getRankById(@Param('id') id: number): Promise<Rank> {
     return this.usersService.getRankById(id);
+  }
+
+  @Get('churchs/:id')
+  getChurchById(@Param('id') id: number): Promise<Rank> {
+    return this.usersService.getChurchById(id);
   }
 
   @Post('create')

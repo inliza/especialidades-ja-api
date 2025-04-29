@@ -8,6 +8,7 @@ import { CreateUserDto } from '../dtos/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto, UpdateUserStatusDto } from '../dtos/update-user.dto';
 import { AuthService } from '../auth/auth.service';
+import { Church } from '../entities/church.entity';
 
 @Injectable()
 export class UsersService {
@@ -15,11 +16,13 @@ export class UsersService {
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Zone) private zoneRepository: Repository<Zone>,
     @InjectRepository(Rank) private rankRepository: Repository<Rank>,
+    @InjectRepository(Church) private churchRepository: Repository<Church>,
+
     private authService: AuthService
   ) { }
 
   async createUser(createUserDto: CreateUserDto): Promise<any> {
-    const { email, password, zoneId, rankId } = createUserDto;
+    const { email, password, zoneId, rankId, churchId } = createUserDto;
 
     const existingUser = await this.userRepository.findOne({ where: { email } });
     if (existingUser) {
@@ -36,8 +39,13 @@ export class UsersService {
       throw new NotFoundException('Rango no encontrado');
     }
 
+    const church = await this.churchRepository.findOne({ where: { id: churchId } });
+    if (!church) {
+      throw new NotFoundException('Iglesia no encontrada');
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    const entity = Object.assign(new User(), { ...createUserDto, password: hashedPassword, zone, rank });
+    const entity = Object.assign(new User(), { ...createUserDto, password: hashedPassword, zone, rank, church });
     await this.userRepository.save(entity);
     return { message: `Usuario ${entity.email} creado con éxito` };
 
@@ -46,23 +54,26 @@ export class UsersService {
   async getUser(id: number): Promise<User> {
     return this.userRepository.findOne({
       where: { id },
-      select: ['id', 'firstName', 'lastName', 'birthDate', 'church', 'email', 'alias', 'phone', 'zone', 'rank', 'isAdmin'],
-      relations: ['zone', 'rank'],
+      select: ['id', 'firstName', 'lastName', 'secondLastName','birthDate', 'church', 'email', 'alias', 'phone', 'zone', 'rank', 'isAdmin'],
+      relations: ['zone', 'rank', 'church'],
     });
   }
 
   async getUserWithSpecialties(id: number): Promise<User> {
     return this.userRepository.findOne({
       where: { id },
-      select: ['id', 'firstName', 'lastName', 'birthDate', 'church', 'alias', 'phone', 'zone', 'rank'],
-      relations: ['zone', 'rank', 'specialties', 'specialties.category'],
+      select: ['id', 'firstName', 'lastName', 'secondLastName','birthDate', 'church', 'alias', 'phone', 'zone', 'rank'],
+      relations: ['zone', 'rank', 'church', 'specialties', 'specialties.category'],
     });
   }
 
   async getUsers(): Promise<User[]> {
     return this.userRepository.find({
-      select: ['id', 'firstName', 'lastName', 'birthDate', 'church', 'email', 'alias', 'phone', 'zone', 'rank', 'isActive'],
-      relations: ['zone', 'rank', 'specialties'],
+      select: ['id', 'firstName', 'lastName','secondLastName', 'church', 'email', 'alias', 'phone', 'zone', 'rank', 'isActive'],
+      relations: ['zone', 'rank', 'specialties', 'church'],
+      order: {
+        firstName: 'ASC',
+      },
     });
   }
 
@@ -82,6 +93,11 @@ export class UsersService {
       const rank = await this.rankRepository.findOne({ where: { id: updateUserDto.rankId } });
       if (!rank) throw new NotFoundException('Rango no encontrado');
       user.rankId = rank.id;
+    }
+
+    const church = await this.churchRepository.findOne({ where: { id: updateUserDto.churchId } });
+    if (!church) {
+      throw new NotFoundException('Iglesia no encontrada');
     }
 
     if (updateUserDto.password) {
@@ -113,7 +129,7 @@ export class UsersService {
     const user = await this.validateUser(email, password);
     if (!user) {
       throw new BadRequestException('Credenciales inválidas');
-    }else if(!user.isActive){
+    } else if (!user.isActive) {
       throw new BadRequestException('Su usuario se encuentra deshabilitado');
     }
 
@@ -151,11 +167,27 @@ export class UsersService {
     return zone;
   }
 
+  async getAllChurchs(): Promise<Church[]> {
+    return this.churchRepository.find();
+  }
+
+  async getAllChurchsByZone(id: number): Promise<Church[]> {
+    return this.churchRepository.find({ where: { zoneId: id } });
+  }
+
 
   async getRankById(id: number): Promise<Rank> {
     const rank = await this.rankRepository.findOne({ where: { id } });
     if (!rank) {
       throw new NotFoundException(`Rank with ID ${id} not found`);
+    }
+    return rank;
+  }
+
+  async getChurchById(id: number): Promise<Rank> {
+    const rank = await this.churchRepository.findOne({ where: { id } });
+    if (!rank) {
+      throw new NotFoundException(`Church with ID ${id} not found`);
     }
     return rank;
   }

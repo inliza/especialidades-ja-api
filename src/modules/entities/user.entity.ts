@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, ManyToMa
 import { Zone } from './zone.entity';
 import { Rank } from './rank.entity';
 import { Specialty } from './specialty.entity';
+import { Church } from './church.entity';
 
 @Entity('users')
 export class User {
@@ -14,11 +15,11 @@ export class User {
   @Column({ name: 'last_name' })
   lastName: string;
 
+  @Column({ name: 'secondlastname' })
+  secondLastName:string;
+
   @Column({ type: 'date', name: 'birth_date' })
   birthDate: string;
-
-  @Column({ name: 'church' })
-  church: string;
 
   @Column({ unique: true, name: 'email' })
   email: string;
@@ -38,6 +39,9 @@ export class User {
   @Column({ type: 'int', name: 'rank_id', nullable: true  })
   rankId: number;
 
+  @Column({ type: 'int', name: 'church_id', nullable: true  })
+  churchId: number;
+
   @ManyToOne(() => Zone, (zone) => zone.users)
   @JoinColumn({ name: 'zone_id' })
   zone: Zone;
@@ -45,6 +49,11 @@ export class User {
   @ManyToOne(() => Rank, (rank) => rank.users)
   @JoinColumn({ name: 'rank_id' })
   rank: Rank;
+
+  @ManyToOne(() => Church, (church) => church.users)
+  @JoinColumn({ name: 'church_id' })
+  church: Church;
+
 
 
   @ManyToMany(() => Specialty, (specialty) => specialty.users)

@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { User } from './user.entity';
+import { Church } from './church.entity';
 
 @Entity('zones')
 export class Zone {
@@ -14,4 +15,8 @@ export class Zone {
 
   @OneToMany(() => User, (user) => user.zone)
   users: User[];
+
+
+  @OneToMany(() => Church, (church) => church.zone)
+  churches: Church[];
 }
