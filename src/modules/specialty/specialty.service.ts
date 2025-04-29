@@ -37,7 +37,8 @@ export class SpecialtyService {
             name: specialtyDto.name,
             active: true,
             category: category,
-            id_category: specialtyDto.id_category
+            id_category: specialtyDto.id_category,
+            url: specialtyDto.url,
         });
 
         return this.specialtyRepository.save(specialty);
